@@ -8,13 +8,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
-  /* Surfaces — ElevenLabs-faithful */
-  --bg: #FAFAF9;              /* warm off-white page */
-  --bg-card: #F1F1EF;         /* gray container (sidebar, warm cards) */
+  /* Surfaces — light paper aesthetic */
+  --bg: #FFFFFF;              /* pure white page */
+  --bg-card: #FAFAF8;         /* barely-tinted warm gray (sidebar bg only) */
   --bg-inner: #FFFFFF;        /* inner white cards */
   --bg-elevated: #FFFFFF;
-  --bg-stone: #F5F2EF;        /* warm stone accent */
-  --bg-stone-alpha: rgba(245, 242, 239, 0.8);
+  --bg-stone: #F4EFE8;        /* warm stone (日柱 column accent, table headers) */
+  --bg-stone-alpha: rgba(244, 239, 232, 0.8);
   --bg-hover: rgba(10, 10, 10, 0.04);
   --bg-active: rgba(10, 10, 10, 0.06);
   --bg-overlay: rgba(10, 10, 10, 0.32);
@@ -171,7 +171,7 @@ input, select { font-family: inherit; }
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--line);
+  border-right: 1px solid var(--line-subtle);
 }
 
 .sidebar-brand {
@@ -419,7 +419,7 @@ input, select { font-family: inherit; }
   font-size: 12px;
   font-weight: 500;
   border-radius: var(--r-pill);
-  background: var(--bg-card);
+  background: var(--bg-stone);
   color: var(--ink-3);
   border: 1px solid var(--line);
 }
