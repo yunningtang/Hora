@@ -264,16 +264,8 @@ function App() {
                 {cachedData && !loading && (
                   <button
                     onClick={() => runTool(activeTab)}
-                    className="btn-ghost"
-                    style={{
-                      marginRight: 20, padding: "4px 10px", fontSize: 12,
-                      color: "var(--ink-tertiary)", background: "transparent",
-                      border: "none", cursor: "pointer", borderRadius: "var(--r-sm)",
-                      transition: "all var(--dur-fast) var(--ease-out)",
-                      fontWeight: 500,
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.color = "var(--ink-primary)"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--ink-tertiary)"; }}
+                    className="btn-plain"
+                    style={{ marginRight: 20, fontSize: 12 }}
                     title="重新排盘"
                   >
                     ↻ 刷新

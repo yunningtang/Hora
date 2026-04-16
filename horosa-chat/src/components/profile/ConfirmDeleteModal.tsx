@@ -27,31 +27,15 @@ export default function ConfirmDeleteModal() {
           </span>
         </div>
         <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-          <button
-            onClick={cancelDelete}
-            style={{
-              padding: "8px 18px", fontSize: 14, fontWeight: 500,
-              color: "var(--ink-secondary)", background: "var(--bg-warm)",
-              border: "none", borderRadius: "var(--r-pill)",
-              cursor: "pointer",
-              transition: "all var(--dur-fast) var(--ease-out)",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.background = "var(--line-subtle)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg-warm)"; }}
-          >
+          <button onClick={cancelDelete} className="btn btn-white">
             取消
           </button>
           <button
             onClick={() => removeProfile(pendingDelete.id)}
-            style={{
-              padding: "8px 18px", fontSize: 14, fontWeight: 500,
-              color: "#fff", background: "var(--el-fire)",
-              border: "none", borderRadius: "var(--r-pill)",
-              cursor: "pointer",
-              transition: "all var(--dur-fast) var(--ease-out)",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(0.92)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; e.currentTarget.style.transform = "none"; }}
+            className="btn"
+            style={{ background: "var(--el-fire)", borderColor: "var(--el-fire)" }}
+            onMouseEnter={(e) => { e.currentTarget.style.filter = "brightness(0.92)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.filter = "none"; }}
           >
             删除
           </button>
