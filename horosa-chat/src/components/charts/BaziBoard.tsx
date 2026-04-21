@@ -1,5 +1,4 @@
 import type { BaziData, PillarKey } from "../../types/horosa";
-import DayunTimeline from "./DayunTimeline";
 
 const KEYS: PillarKey[] = ["year", "month", "day", "time"];
 const CN = { year: "年柱", month: "月柱", day: "日柱", time: "时柱" };
@@ -77,27 +76,125 @@ function Sanyuan({ data }: { data: BaziData }) {
   );
 }
 
-/* ── Season ── */
-function Season({ season }: { season: Record<string, string> }) {
+/* ── Season (五行旺相 — big cards with scores + colored bar) ── */
+function Season({ data }: { data: BaziData }) {
   const order = ["木", "火", "土", "金", "水"] as const;
   const ek: Record<string, string> = { 金: "Metal", 木: "Wood", 水: "Water", 火: "Fire", 土: "Earth" };
 
+  /** Estimate element scores from branch + stemInBranch across four pillars.
+   * Stem = 1.0, main 藏干 = 1.0, secondary 藏干 = 0.5 tertiary = 0.3.
+   * (Rough industry-standard weighting; good enough for visual display.)
+   */
+  const scores = (() => {
+    const s: Record<string, number> = { Metal: 0, Wood: 0, Water: 0, Fire: 0, Earth: 0 };
+    (["year", "month", "day", "time"] as const).forEach((k) => {
+      const p = data.fourColumns[k];
+      if (!p) return;
+      if (p.stem) s[p.stem.element] = (s[p.stem.element] ?? 0) + 1.0;
+      if (p.stemInBranch) {
+        p.stemInBranch.forEach((hg, i) => {
+          const w = i === 0 ? 1.0 : i === 1 ? 0.5 : 0.3;
+          s[hg.element] = (s[hg.element] ?? 0) + w;
+        });
+      }
+    });
+    return s;
+  })();
+  const maxScore = Math.max(...Object.values(scores), 1);
+
+  // Determine the "season" phrase (秋月·金旺木囚)
+  const seasonStrs = Object.entries(data.season ?? {})
+    .filter(([, v]) => v === "旺" || v === "囚")
+    .map(([k, v]) => `${k}${v}`)
+    .slice(0, 2)
+    .join("");
+
   return (
-    <div className="card" style={{ padding: "16px 20px", marginTop: 20 }}>
-      <div style={{ fontSize: 13, fontWeight: 500, color: "var(--ink-tertiary)", marginBottom: 12, letterSpacing: 1 }}>
-        五行旺相
+    <div className="card" style={{ padding: "18px 22px 22px", marginTop: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)", letterSpacing: 1 }}>
+          五 行 旺 相
+        </div>
+        {seasonStrs && (
+          <div style={{ fontSize: 11, color: "var(--ink-4)", letterSpacing: 1 }}>
+            秋月 · {seasonStrs}
+          </div>
+        )}
       </div>
-      <div style={{ display: "flex", gap: 32 }}>
-        {order.map((el) => (
-          <div key={el} style={{ textAlign: "center" }}>
-            <div className={c(ek[el])} style={{
-              fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 300, lineHeight: 1,
-            }}>
-              {el}
+      <div className="wuxing-grid">
+        {order.map((el) => {
+          const elKey = ek[el];
+          const phase = data.season?.[el] ?? "";
+          const score = scores[elKey] ?? 0;
+          const pct = Math.round((score / maxScore) * 100);
+          return (
+            <div key={el} className="wuxing-card">
+              <div className={`ch ${c(elKey)}`}>{el}</div>
+              <div className="phase">{phase}</div>
+              <div className="score">{score.toFixed(1)}</div>
+              <div className={`bar ${c(elKey)}`} style={{ width: `${Math.max(pct, 6)}%`, marginTop: 2 }} />
             </div>
-            <div style={{ fontSize: 12, color: "var(--ink-tertiary)", marginTop: 6 }}>{season[el] ?? "?"}</div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ── Dayun (大运 — 9 horizontal cards, current marker) ── */
+function DayunStrip({ data, birthDate }: { data: BaziData; birthDate: string }) {
+  const directions = data.direction;
+  if (!directions || directions.length === 0) return null;
+
+  const [y, m, d] = birthDate.split("-").map(Number);
+  const now = new Date();
+  let curAge = now.getFullYear() - y;
+  if (now.getMonth() + 1 < m || (now.getMonth() + 1 === m && now.getDate() < d)) curAge--;
+  const activeIdx = directions.findIndex((dn) => curAge >= dn.age && curAge < dn.age + 10);
+
+  return (
+    <div className="card" style={{ padding: "18px 22px 20px", marginTop: 20 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 16 }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)", letterSpacing: 1 }}>
+          大 运
+        </div>
+        <div style={{ fontSize: 11, color: "var(--ink-4)", letterSpacing: 0.5 }}>
+          {data.directAge != null && (
+            <>
+              <span style={{ background: "var(--bg-stone)", color: "var(--el-fire)", padding: "1px 6px", borderRadius: 3, marginRight: 8, fontWeight: 600 }}>起运</span>
+              <span style={{ fontFamily: "var(--font-mono)", fontWeight: 600, color: "var(--ink-2)" }}>{data.directAge.toFixed(2)}</span> 岁
+              {data.directTime && <span style={{ marginLeft: 8, fontFamily: "var(--font-mono)" }}>{data.directTime.slice(0, 10)}</span>}
+              {data.gender && <span className="mini-chip" style={{ marginLeft: 10 }}>{data.gender === "Male" ? "乾造" : "坤造"}</span>}
+            </>
+          )}
+        </div>
+      </div>
+      <div className="dayun-strip">
+        {directions.map((dn, i) => (
+          <div key={i} className={`dayun-card ${i === activeIdx ? "active" : ""}`}>
+            {i === activeIdx && <div className="dayun-badge">当前</div>}
+            <div className="age-range">{dn.age}-{dn.age + 9} 岁</div>
+            <div className={`stem ${c(dn.mainDirect.stem.element)}`}>{dn.mainDirect.stem.cell}</div>
+            <div className={`branch ${c(dn.mainDirect.branch.element)}`}>{dn.mainDirect.branch.cell}</div>
+            <div className="shishen">{dn.mainDirect.stem.relative}</div>
+            <div className="year-label">{dn.startYear}</div>
           </div>
         ))}
+      </div>
+      <div style={{
+        marginTop: 14, paddingTop: 12, borderTop: "1px dashed var(--line)",
+        display: "flex", justifyContent: "center", alignItems: "center", gap: 6,
+        fontSize: 11, color: "var(--ink-4)",
+      }}>
+        点击大运可展开十年流年
+        {activeIdx >= 0 && (
+          <>
+            <span style={{ marginLeft: 10, display: "inline-flex", alignItems: "center", gap: 4 }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--el-fire)" }} />
+              当前
+            </span>
+          </>
+        )}
       </div>
     </div>
   );
@@ -305,10 +402,10 @@ export default function BaziBoard({ data }: { data: BaziData }) {
         </table>
       </div>
 
+      <Season data={data} />
+      <DayunStrip data={data} birthDate={data.nongli?.birth?.slice(0, 10) ?? ""} />
       <Interactions data={data} />
-      <DayunTimeline bazi={data} birthDate={data.nongli?.birth?.slice(0, 10) ?? ""} />
       <Sanyuan data={data} />
-      <Season season={data.season} />
     </div>
   );
 }

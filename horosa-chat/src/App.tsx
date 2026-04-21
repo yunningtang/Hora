@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAppStore, useActiveProfile, useCachedChart, type TabKey } from "./stores/appStore";
 import { callTool } from "./lib/mcp";
 import ProfileForm from "./components/profile/ProfileForm";
@@ -6,18 +6,18 @@ import ProfileManager from "./components/profile/ProfileManager";
 import ConfirmDeleteModal from "./components/profile/ConfirmDeleteModal";
 import BaziBoard from "./components/charts/BaziBoard";
 import InteractionDiagram from "./components/charts/InteractionDiagram";
-import ZiweiBoard from "./components/charts/ZiweiBoard";
-import AstroChart from "./components/charts/AstroChart";
-import SixYaoView from "./components/charts/SixYaoView";
-import QimenGrid from "./components/charts/QimenGrid";
+const ZiweiBoard = lazy(() => import("./components/charts/ZiweiBoard"));
+const AstroChart = lazy(() => import("./components/charts/AstroChart"));
+const SixYaoView = lazy(() => import("./components/charts/SixYaoView"));
+const QimenGrid = lazy(() => import("./components/charts/QimenGrid"));
 import type { BaziBirthResponse, BaziData } from "./types/horosa";
 
 const TABS: { key: TabKey; label: string; tool: string; btnLabel: string }[] = [
-  { key: "bazi", label: "八字", tool: "horosa_cn_bazi_direct", btnLabel: "排八字" },
-  { key: "ziwei", label: "紫微", tool: "horosa_cn_ziwei_birth", btnLabel: "排紫微" },
-  { key: "astro", label: "西占", tool: "horosa_astro_chart", btnLabel: "排星盘" },
-  { key: "sixyao", label: "六爻", tool: "horosa_cn_sixyao", btnLabel: "起卦" },
-  { key: "qimen", label: "奇门", tool: "horosa_cn_qimen", btnLabel: "排奇门" },
+  { key: "bazi", label: "八 字", tool: "horosa_cn_bazi_direct", btnLabel: "排八字" },
+  { key: "ziwei", label: "紫 微", tool: "horosa_cn_ziwei_birth", btnLabel: "排紫微" },
+  { key: "astro", label: "西 占", tool: "horosa_astro_chart", btnLabel: "排星盘" },
+  { key: "sixyao", label: "六 爻", tool: "horosa_cn_sixyao", btnLabel: "起卦" },
+  { key: "qimen", label: "奇 门", tool: "horosa_cn_qimen", btnLabel: "排奇门" },
 ];
 
 function ErrorToast() {
@@ -34,7 +34,7 @@ function ErrorToast() {
       <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--el-fire)", marginTop: 6, flexShrink: 0 }} />
       <div style={{ flex: 1 }}>
         <div style={{ fontWeight: 500, marginBottom: 2 }}>调用失败</div>
-        <div style={{ color: "var(--ink-tertiary)", fontSize: 12, lineHeight: 1.5 }}>{error}</div>
+        <div style={{ color: "var(--ink-4)", fontSize: 12, lineHeight: 1.5 }}>{error}</div>
       </div>
       <button onClick={() => setError(null)} className="icon-btn" style={{ width: 22, height: 22 }} aria-label="关闭">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -45,12 +45,18 @@ function ErrorToast() {
   );
 }
 
-function Skeleton() {
+function Skeleton({ tab = "bazi" }: { tab?: TabKey }) {
+  const layouts: Record<TabKey, number[]> = {
+    bazi: [48, 420, 160, 100, 100],
+    ziwei: [560],
+    astro: [420, 260],
+    sixyao: [80, 260, 100, 100],
+    qimen: [60, 420],
+  };
+  const heights = layouts[tab] ?? layouts.bazi;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div className="skeleton" style={{ height: 80 }} />
-      <div className="skeleton" style={{ height: 240 }} />
-      <div className="skeleton" style={{ height: 120 }} />
+      {heights.map((h, i) => <div key={i} className="skeleton" style={{ height: h }} />)}
     </div>
   );
 }
@@ -85,6 +91,37 @@ function TabBar({ activeTab, onChange }: { activeTab: TabKey; onChange: (t: TabK
   );
 }
 
+function RefreshIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+      <path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" />
+      <path d="M21 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" />
+    </svg>
+  );
+}
+function MenuIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+      <line x1="4" y1="8" x2="20" y2="8" /><line x1="4" y1="16" x2="20" y2="16" />
+    </svg>
+  );
+}
+function ExportIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+      <polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+    </svg>
+  );
+}
+function ChatIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+    </svg>
+  );
+}
+
 function App() {
   const store = useAppStore();
   const activeProfile = useActiveProfile();
@@ -97,7 +134,6 @@ function App() {
 
   useEffect(() => { store.hydrate(); /* eslint-disable-line react-hooks/exhaustive-deps */ }, []);
 
-  // Auto-fetch on tab/profile change when no cached data
   useEffect(() => {
     if (!activeProfile || !hydrated) return;
     const key = `${activeProfile.id}:${activeTab}`;
@@ -107,12 +143,15 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProfile?.id, activeTab, cachedData, hydrated]);
 
-  // Keyboard shortcuts
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key === "n") {
         e.preventDefault();
         store.openNewProfile();
+      }
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        document.querySelector<HTMLInputElement>(".sidebar-search input")?.focus();
       }
       if (e.key === "Escape") {
         if (profileDraft) store.closeProfileDraft();
@@ -166,6 +205,9 @@ function App() {
 
   function renderChart() {
     if (!cachedData) return null;
+    const lazyWrap = (el: React.ReactNode) => (
+      <Suspense fallback={<Skeleton tab={activeTab} />}>{el}</Suspense>
+    );
     switch (activeTab) {
       case "bazi":
         return (
@@ -174,10 +216,10 @@ function App() {
             <InteractionDiagram data={cachedData as BaziData} />
           </>
         );
-      case "ziwei": return <ZiweiBoard data={cachedData as Record<string, unknown>} />;
-      case "astro": return <AstroChart data={cachedData as Record<string, unknown>} />;
-      case "sixyao": return <SixYaoView data={cachedData as Record<string, unknown>} />;
-      case "qimen": return <QimenGrid data={cachedData as Record<string, unknown>} />;
+      case "ziwei": return lazyWrap(<ZiweiBoard data={cachedData as Record<string, unknown>} />);
+      case "astro": return lazyWrap(<AstroChart data={cachedData as Record<string, unknown>} />);
+      case "sixyao": return lazyWrap(<SixYaoView data={cachedData as Record<string, unknown>} />);
+      case "qimen": return lazyWrap(<QimenGrid data={cachedData as Record<string, unknown>} />);
     }
   }
 
@@ -186,10 +228,7 @@ function App() {
 
   if (!hydrated) {
     return (
-      <div style={{
-        display: "flex", alignItems: "center", justifyContent: "center",
-        height: "100vh", color: "var(--ink-disabled)", fontSize: 13,
-      }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "var(--ink-5)", fontSize: 13 }}>
         <div className="loading-dots"><span /><span /><span /></div>
       </div>
     );
@@ -198,26 +237,9 @@ function App() {
   return (
     <>
       <div className="layout">
-        {/* Sidebar */}
+        {/* Sidebar — 和罗 branded */}
         <aside className="sidebar">
-          <div className="sidebar-brand">
-            <div style={{
-              fontFamily: "var(--font-display)", fontSize: 19, fontWeight: 300,
-              color: "var(--ink-primary)", letterSpacing: 1.8, lineHeight: 1.2,
-            }}>
-              命理工作台
-            </div>
-            <div style={{ fontSize: 11, color: "var(--ink-tertiary)", marginTop: 4, letterSpacing: 1 }}>
-              horosa
-            </div>
-          </div>
-
           <ProfileManager />
-
-          <div style={{ flex: 1 }} />
-          <div style={{ padding: "10px 20px 0", borderTop: "1px solid var(--line-subtle)" }}>
-            <div style={{ fontSize: 10, color: "var(--ink-disabled)", letterSpacing: 0.5 }}>v0.4.0 · local</div>
-          </div>
         </aside>
 
         {/* Main */}
@@ -225,58 +247,65 @@ function App() {
           {activeProfile ? (
             <>
               {/* Profile strip */}
-              <div style={{
-                padding: "18px 32px",
-                display: "flex", alignItems: "center", gap: 16,
-                borderBottom: "1px solid var(--line-subtle)",
-                background: "var(--bg-base)",
-              }}>
-                <div style={{
-                  width: 40, height: 40, borderRadius: "50%",
-                  background: "var(--ink-primary)", color: "var(--bg-base)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 16, fontWeight: 600, fontFamily: "var(--font-display)",
-                  flexShrink: 0,
-                }}>
+              <div className="profile-strip">
+                <div className="profile-strip-avatar">
                   {activeProfile.name.slice(0, 1)}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 16, fontWeight: 600, color: "var(--ink-primary)", letterSpacing: 0.2 }}>
-                    {activeProfile.name}
-                    <span style={{ marginLeft: 10, fontSize: 12, color: "var(--ink-disabled)", fontWeight: 400 }}>
+                  <div className="profile-strip-name">
+                    <span>{activeProfile.name.length === 2 ? `${activeProfile.name[0]} ${activeProfile.name[1]}` : activeProfile.name}</span>
+                    <span className="mini-chip">
                       {activeProfile.gender === "M" ? "♂ 男" : activeProfile.gender === "F" ? "♀ 女" : "⚥"}
                     </span>
+                    {activeProfile.relation && (
+                      <span className="mini-chip">{activeProfile.relation}</span>
+                    )}
                   </div>
-                  <div style={{
-                    fontSize: 12, color: "var(--ink-tertiary)", marginTop: 3,
-                    fontFamily: "var(--font-mono)", letterSpacing: 0.3,
-                  }}>
-                    {activeProfile.birthDate} {activeProfile.birthTime} · {activeProfile.location} · UTC{Number(activeProfile.zone) >= 0 ? "+" : ""}{activeProfile.zone}
+                  <div className="profile-strip-meta">
+                    <span>{activeProfile.birthDate}</span>
+                    <span className="sep">·</span>
+                    <span>{activeProfile.birthTime}</span>
+                    <span className="sep">·</span>
+                    <span>{activeProfile.location}{activeProfile.subLocation ? ` ${activeProfile.subLocation}` : ""}</span>
+                    {activeProfile.trueSolarTime !== false && (
+                      <>
+                        <span className="sep">·</span>
+                        <span>真太阳时</span>
+                      </>
+                    )}
                   </div>
+                </div>
+                <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                  <button className="btn ghost" style={{ gap: 5 }}>
+                    <ExportIcon />
+                    导 出
+                  </button>
+                  <button className="btn" style={{ gap: 6 }}>
+                    <ChatIcon />
+                    问 和 罗
+                  </button>
                 </div>
               </div>
 
               {/* Tab bar */}
-              <div style={{ position: "relative", display: "flex", alignItems: "center", borderBottom: "1px solid var(--line-subtle)" }}>
+              <div style={{ position: "relative", display: "flex", alignItems: "center", background: "var(--bg)" }}>
                 <div style={{ flex: 1 }}>
                   <TabBar activeTab={activeTab} onChange={store.setActiveTab} />
                 </div>
-                {cachedData && !loading && (
-                  <button
-                    onClick={() => runTool(activeTab)}
-                    className="btn-plain"
-                    style={{ marginRight: 20, fontSize: 12 }}
-                    title="重新排盘"
-                  >
-                    ↻ 刷新
+                <div style={{ display: "flex", alignItems: "center", gap: 2, paddingRight: 24, position: "absolute", right: 0 }}>
+                  <button className="icon-btn" title="重新排盘" onClick={() => runTool(activeTab)} disabled={loading}>
+                    <RefreshIcon />
                   </button>
-                )}
+                  <button className="icon-btn" title="更多" style={{ marginLeft: 4 }}>
+                    <MenuIcon />
+                  </button>
+                </div>
               </div>
 
               {/* Content */}
               <div className="content-area">
                 {loading ? (
-                  <Skeleton />
+                  <Skeleton tab={activeTab} />
                 ) : cachedData ? (
                   <div key={`${activeProfile.id}:${activeTab}`} className="fade-in">
                     {renderChart()}
@@ -289,7 +318,7 @@ function App() {
                   }}>
                     <div style={{
                       fontFamily: "var(--font-display)", fontSize: 64, fontWeight: 200,
-                      color: "var(--ink-disabled)", lineHeight: 1,
+                      color: "var(--ink-5)", lineHeight: 1,
                     }}>
                       {activeTab === "bazi" ? "命" : activeTab === "ziwei" ? "微" : activeTab === "astro" ? "☉" : activeTab === "sixyao" ? "卦" : "奇"}
                     </div>
@@ -307,18 +336,18 @@ function App() {
               animation: "fade-in var(--dur-slow) var(--ease-out)",
             }}>
               <div style={{
-                fontFamily: "var(--font-display)", fontSize: 64, fontWeight: 200,
-                color: "var(--ink-disabled)", lineHeight: 1,
+                fontFamily: "var(--font-display)", fontSize: 72, fontWeight: 200,
+                color: "var(--ink-5)", lineHeight: 1, letterSpacing: 8,
               }}>
-                档
+                和 罗
               </div>
               <div style={{ textAlign: "center", maxWidth: 340 }}>
-                <div style={{ fontSize: 15, color: "var(--ink-secondary)", marginBottom: 10, letterSpacing: 0.2 }}>
+                <div style={{ fontSize: 15, color: "var(--ink-3)", marginBottom: 10, letterSpacing: 0.2 }}>
                   {store.profiles.length > 0 ? "选择左侧档案以开始" : "还没有档案"}
                 </div>
                 {store.profiles.length === 0 && (
                   <>
-                    <div style={{ fontSize: 13, color: "var(--ink-tertiary)", lineHeight: 1.7, marginBottom: 24 }}>
+                    <div style={{ fontSize: 13, color: "var(--ink-4)", lineHeight: 1.7, marginBottom: 24 }}>
                       档案是一个人的生辰信息,用于排八字、紫微、西占等命盘。
                       所有数据保存在本地浏览器,不上传。
                     </div>

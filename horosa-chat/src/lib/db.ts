@@ -19,6 +19,12 @@ export interface Profile {
   lat: string;
   lon: string;
   location: string;
+  /** Free-form subdistrict / neighborhood under location (e.g. 徐汇) */
+  subLocation?: string;
+  /** Relation tag displayed next to name (朋友 / 历史人物 / 家人 etc.) */
+  relation?: string;
+  /** Whether birth time is given in true solar time */
+  trueSolarTime?: boolean;
   createdAt: number;
   updatedAt: number;
 }

@@ -14,25 +14,30 @@ export default function ProfileForm({ initial, onDone }: { initial?: Partial<Pro
 
   const [name, setName] = useState(initial?.name ?? "");
   const [gender, setGender] = useState<"M" | "F" | "X">((initial?.gender as "M" | "F" | "X") ?? "M");
+  const [relation, setRelation] = useState(initial?.relation ?? "");
   const [birthDate, setBirthDate] = useState(initial?.birthDate ?? "1990-06-15");
   const [birthTime, setBirthTime] = useState(initial?.birthTime ?? "12:00");
   const [unknownTime, setUnknownTime] = useState(false);
+  const [trueSolarTime, setTrueSolarTime] = useState(initial?.trueSolarTime ?? true);
   const [lat, setLat] = useState(initial?.lat ?? "39.90");
   const [lon, setLon] = useState(initial?.lon ?? "116.40");
   const [zone, setZone] = useState(initial?.zone ?? "8");
   const [location, setLocation] = useState(initial?.location ?? "北京");
+  const [subLocation, setSubLocation] = useState(initial?.subLocation ?? "");
 
-  // When switching to a different initial prop, reset form
   useEffect(() => {
     if (initial) {
       setName(initial.name ?? "");
       setGender((initial.gender as "M" | "F" | "X") ?? "M");
+      setRelation(initial.relation ?? "");
       setBirthDate(initial.birthDate ?? "1990-06-15");
       setBirthTime(initial.birthTime ?? "12:00");
+      setTrueSolarTime(initial.trueSolarTime ?? true);
       setLat(initial.lat ?? "39.90");
       setLon(initial.lon ?? "116.40");
       setZone(initial.zone ?? "8");
       setLocation(initial.location ?? "北京");
+      setSubLocation(initial.subLocation ?? "");
       setStep(0);
     }
   }, [initial?.id]);
@@ -42,12 +47,15 @@ export default function ProfileForm({ initial, onDone }: { initial?: Partial<Pro
       id: initial?.id ?? crypto.randomUUID(),
       name: name.trim() || "未命名",
       gender,
+      relation: relation.trim() || undefined,
       birthDate,
       birthTime: unknownTime ? "12:00" : birthTime,
+      trueSolarTime,
       zone,
       lat,
       lon,
       location,
+      subLocation: subLocation.trim() || undefined,
       createdAt: initial?.createdAt ?? Date.now(),
       updatedAt: Date.now(),
     });
@@ -128,7 +136,7 @@ export default function ProfileForm({ initial, onDone }: { initial?: Partial<Pro
             />
           </div>
 
-          <div style={{ marginBottom: 24 }}>
+          <div style={{ marginBottom: 16 }}>
             <label style={labelStyle}>性别</label>
             <div style={{ display: "flex", gap: 8 }}>
               {([["M", "男"], ["F", "女"], ["X", "其他"]] as const).map(([val, lb]) => (
@@ -138,8 +146,8 @@ export default function ProfileForm({ initial, onDone }: { initial?: Partial<Pro
                   onClick={() => setGender(val)}
                   style={{
                     flex: 1, padding: "10px 0", fontSize: 14, fontWeight: 500,
-                    color: gender === val ? "var(--bg-base)" : "var(--ink-secondary)",
-                    background: gender === val ? "var(--ink-primary)" : "var(--bg-warm)",
+                    color: gender === val ? "var(--accent-inv)" : "var(--ink-3)",
+                    background: gender === val ? "var(--ink)" : "var(--bg-card)",
                     border: "none", borderRadius: "var(--r-md)",
                     cursor: "pointer", transition: "all 0.2s ease",
                   }}
@@ -148,6 +156,35 @@ export default function ProfileForm({ initial, onDone }: { initial?: Partial<Pro
                 </button>
               ))}
             </div>
+          </div>
+
+          <div style={{ marginBottom: 24 }}>
+            <label style={labelStyle}>关系标签 <span style={{ color: "var(--ink-5)", fontWeight: 400 }}>(可选)</span></label>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8 }}>
+              {["朋友", "家人", "伴侣", "同事", "历史人物", "客户"].map((r) => (
+                <button
+                  key={r}
+                  type="button"
+                  onClick={() => setRelation(r === relation ? "" : r)}
+                  style={{
+                    padding: "5px 12px", fontSize: 12, fontWeight: 500,
+                    color: relation === r ? "var(--accent-inv)" : "var(--ink-3)",
+                    background: relation === r ? "var(--ink)" : "var(--bg-card)",
+                    border: "none", borderRadius: "var(--r-pill)",
+                    cursor: "pointer", transition: "all 0.15s ease",
+                  }}
+                >
+                  {r}
+                </button>
+              ))}
+            </div>
+            <input
+              className="input-field"
+              value={relation}
+              onChange={(e) => setRelation(e.target.value)}
+              placeholder="自定义关系..."
+              style={{ fontSize: 13, height: 36 }}
+            />
           </div>
 
           <button className="btn" style={{ width: "100%", padding: "10px 24px", fontSize: 15 }}

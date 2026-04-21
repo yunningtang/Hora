@@ -1,11 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════
    Design System — DesignGrab × ElevenLabs
    warm off-white · pure black accent · pill buttons
    ═══════════════════════════════════════════ */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
   /* Surfaces — light paper aesthetic */
@@ -165,13 +164,14 @@ input, select { font-family: inherit; }
 }
 
 .sidebar {
-  width: 240px;
+  width: 264px;
   background: var(--bg-card);
-  padding: 28px 0 16px;
+  padding: 0;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--line-subtle);
+  position: relative;
 }
 
 .sidebar-brand {
@@ -677,3 +677,318 @@ input, select { font-family: inherit; }
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* ═══════════════════════════════════════════
+   Heluo (和罗) brand components
+   ═══════════════════════════════════════════ */
+
+.brand-heluo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 22px 18px;
+  border-bottom: 1px solid var(--line-subtle);
+  position: relative;
+}
+.brand-heluo-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 6px;
+  line-height: 1;
+}
+.brand-heluo-sub {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--ink-4);
+  letter-spacing: 4px;
+  margin-top: 6px;
+}
+.brand-heluo-glyph {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 300;
+  color: var(--ink);
+  line-height: 1;
+  letter-spacing: 0;
+  opacity: 0.9;
+}
+
+/* Search bar — pill with ⌘K hint */
+.sidebar-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  margin: 16px 16px 12px;
+  padding: 0 12px;
+  background: var(--bg-inner);
+  border: 1px solid var(--line);
+  border-radius: var(--r-pill);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+.sidebar-search:focus-within { border-color: var(--ink-3); }
+.sidebar-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 13px;
+  color: var(--ink);
+  font-family: inherit;
+}
+.sidebar-search input::placeholder { color: var(--ink-5); }
+.sidebar-search .kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-4);
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--bg);
+}
+
+.sidebar-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px 8px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-4);
+  letter-spacing: 3px;
+}
+
+/* Ask Heluo floating button */
+.ask-heluo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  background: var(--ink);
+  color: var(--accent-inv);
+  border: none;
+  border-radius: var(--r-pill);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease-out);
+  box-shadow: 0 6px 20px rgba(10, 10, 10, 0.18);
+}
+.ask-heluo:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(10, 10, 10, 0.22);
+}
+.ask-heluo:active {
+  transform: translateY(0) scale(0.97);
+}
+
+.sidebar-footer-actions {
+  padding: 14px 18px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Profile strip (top header) */
+.profile-strip {
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  border-bottom: 1px solid var(--line-subtle);
+  background: var(--bg);
+}
+.profile-strip-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--accent-inv);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.profile-strip-name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 4px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.profile-strip-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  letter-spacing: 0.3px;
+}
+.profile-strip-meta .sep {
+  color: var(--ink-5);
+}
+
+/* Small chip with subtle bg */
+.mini-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-3);
+  background: var(--bg-card);
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.mini-chip.amber { background: var(--bg-stone); color: var(--el-metal); }
+.mini-chip.blue { background: rgba(74, 111, 232, 0.08); color: var(--pop-blue); }
+
+/* Five-element score card */
+.wuxing-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+}
+.wuxing-card {
+  padding: 22px 16px 0;
+  background: var(--bg-inner);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  text-align: center;
+  position: relative;
+}
+.wuxing-card .ch {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.wuxing-card .phase {
+  font-size: 12px;
+  color: var(--ink-4);
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+}
+.wuxing-card .score {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+.wuxing-card .bar {
+  height: 4px;
+  background: currentColor;
+  opacity: 0.55;
+  border-radius: 0;
+}
+
+/* Dayun card strip */
+.dayun-strip {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 10px;
+}
+.dayun-card {
+  padding: 12px 8px 14px;
+  background: var(--bg-inner);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease-out);
+  position: relative;
+}
+.dayun-card:hover {
+  border-color: var(--line-2);
+  transform: translateY(-1px);
+}
+.dayun-card.active {
+  background: var(--bg-stone);
+  border-color: var(--el-metal);
+}
+.dayun-card .age-range {
+  font-size: 11px;
+  color: var(--ink-4);
+  font-family: var(--font-mono);
+  margin-bottom: 8px;
+}
+.dayun-card .stem {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.05;
+}
+.dayun-card .branch {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1.05;
+  margin-bottom: 6px;
+}
+.dayun-card .shishen {
+  font-size: 10px;
+  color: var(--ink-4);
+  letter-spacing: 0.5px;
+}
+.dayun-card .year-label {
+  font-size: 11px;
+  color: var(--ink-5);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.dayun-badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 9px;
+  background: var(--el-fire);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.5px;
+}
+
+/* Pillar-relation diagram */
+.pillar-bubble {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--bg-inner);
+  border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 500;
+}
+
+/* Shensha chip variants */
+.shensha {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 9px;
+  font-size: 11px;
+  font-weight: 500;
+  border-radius: var(--r-pill);
+  white-space: nowrap;
+}
+.shensha.good { background: var(--el-wood-bg); color: var(--el-wood); }
+.shensha.bad { background: var(--el-fire-bg); color: var(--el-fire); }
+.shensha.neutral { background: rgba(99, 91, 255, 0.08); color: var(--pop-purple); }
+.shensha.peach { background: rgba(255, 107, 53, 0.08); color: var(--pop-orange); }
+
